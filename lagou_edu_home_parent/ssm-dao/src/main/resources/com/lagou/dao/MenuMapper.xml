@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lagou.dao.MenuMapper">
+
+    <resultMap id="menuResult" type="menu">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="href" column="href"/>
+        <result property="icon" column="icon"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="shown" column="shown"/>
+        <result property="level" column="level"/>
+        <result property="createdTime" column="created_time"/>
+        <result property="updatedTime" column="updated_time"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="updatedBy" column="updated_by"/>
+
+        <!--嵌套查询
+            因为当前要调用的方法就在当前映射配置文件中，所以我们直接写相应的的 id 即可 不需加上映射配置文件的全路径
+        -->
+        <collection property="subMenuList" column="id"
+                    ofType="menu" select="findSubMenuListByPid"/>
+    </resultMap>
+
+    <!--查询所有父子菜单信息
+        所有顶级菜单的父级菜单 id 都为 -1
+    -->
+    <select id="findSubMenuListByPid" resultMap="menuResult" parameterType="int">
+        select * from menu where parent_id = #{pid}
+    </select>
+
+    <!--查询所有菜单列表-->
+    <select id="findAllMenu" resultType="menu">
+        select * from menu
+    </select>
+
+    <!--根据 id 查询具体菜单信息(menu)-->
+    <select id="findMenuById" resultType="menu" parameterType="int">
+        select * from menu where id = #{id}
+    </select>
+
+    <!--新增菜单-->
+    <insert id="saveMenu" parameterType="menu">
+        insert into menu values(
+            null, #{parentId}, #{href}, #{icon}, #{name}, #{description},
+            #{orderNum}, #{shown}, #{level}, #{createdTime}, #{updatedTime},
+            #{createdBy}, #{updatedBy}
+        )
+    </insert>
+
+    <!--修改菜单-->
+    <update id="updateMenu" parameterType="menu">
+        update menu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null and parentId != ''">
+                parent_id = #{parentId},
+            </if>
+            <if test="href != null and href != ''">
+                href = #{href},
+            </if>
+            <if test="icon != null and icon != ''">
+                icon = #{icon},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="orderNum != null and orderNum != ''">
+                order_num = #{orderNum},
+            </if>
+            <if test="shown != null and shown != ''">
+                shown = #{shown},
+            </if>
+            <if test="level != null and level != ''">
+                level = #{level},
+            </if>
+            <if test="updatedTime != null">
+                updated_time = #{updatedTime},
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                updated_by = #{updatedBy},
+            </if>
+        </trim>
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+        </where>
+    </update>
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lagou.dao.PromotionSpaceMapper">
+
+    <!--查询所有的广告位-->
+    <select id="findAllPromotionSpace" resultType="com.lagou.domain.PromotionSpace">
+        select * from promotion_space where isDel = 0
+    </select>
+
+    <!--添加广告位-->
+    <insert id="savePromotionSpace" parameterType="com.lagou.domain.PromotionSpace">
+        insert into promotion_space values(
+            null, #{name}, #{spaceKey}, #{createTime}, #{updateTime}, #{isDel}
+        )
+    </insert>
+
+    <!--修改广告位-->
+    <update id="updatePromotionSpace" parameterType="com.lagou.domain.PromotionSpace">
+        update promotion_space
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="updateTime != null">
+                updateTime = #{updateTime},
+            </if>
+        </trim>
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+        </where>
+    </update>
+
+    <!--回显广告位名称
+    根据 ID 查询广告位信息-->
+    <select id="findPromotionSpaceById" resultType="com.lagou.domain.PromotionSpace" parameterType="int">
+        select name, id from promotion_space where id = #{id}
+    </select>
+</mapper>
